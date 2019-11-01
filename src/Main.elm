@@ -1,12 +1,12 @@
 module Main exposing (..)
 
 import Browser
-import CustomElements exposing (..)
 import Header exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, src)
 import Http
 import Json.Decode exposing (Decoder, field, list, string)
+import ModelViewer exposing (..)
 
 
 apiUrl =
@@ -20,7 +20,7 @@ apiUrl =
 type Model
     = Failure
     | Loading
-    | Success (List String)
+    | Success { models : List String, loaded : List String }
 
 
 init : () -> ( Model, Cmd Msg )
@@ -55,7 +55,7 @@ update msg model =
         GotList result ->
             case result of
                 Ok list ->
-                    ( Success list, Cmd.none )
+                    ( Success { models = list, loaded = [] }, Cmd.none )
 
                 Err why ->
                     ( Failure, Cmd.none )
@@ -74,13 +74,23 @@ view model =
 
 
 viewList : Model -> Html Msg
-viewList model = case model of
-    Failure -> p [] [ text "Something went wrong :("]
-    Loading -> p [] [ text "Loading list..."]
-    Success models -> div [] (List.map viewModel models)
+viewList model =
+    case model of
+        Failure ->
+            p [] [ text "Something went wrong :(" ]
 
-viewModel : String -> Html Msg
-viewModel url = modelViewer (apiUrl ++ "static/" ++ url)
+        Loading ->
+            p [] [ text "Loading list..." ]
+
+        Success { models } ->
+            div [] (List.map modelWithThumb models)
+
+
+modelWithThumb : String -> Html Msg
+modelWithThumb url =
+    viewModel (apiUrl ++ "static/" ++ url) "https://marianatura.es/wp-content/uploads/2015/08/Chorizo-Barbacoa-Dulce.jpg" False
+
+
 
 ---- PROGRAM ----
 
