@@ -21,4 +21,4 @@ modelViewerBase =
 
 modelViewer : String -> Html a
 modelViewer src =
-    modelViewerBase [ attribute "background-color" "#fafafa", attribute "src" src, attribute "camera-controls" "true", attribute "auto-rotate" "true" ] []
+    modelViewerBase [ attribute "background-color" "#fafafa", attribute "src" src, attribute "camera-controls" "true" ] []

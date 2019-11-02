@@ -7,19 +7,32 @@ import Html exposing (..)
 import Html.Attributes exposing (attribute, src)
 import Html.Events exposing (onClick)
 import Http
-import Json.Decode exposing (Decoder, field, list, string)
+import Json.Decode exposing (Decoder, field, list, map2, string)
 
 
 apiUrl =
     "http://localhost:3002/"
 
 
+staticResource : String -> String
+staticResource src =
+    apiUrl ++ "static/" ++ src
+
+
 
 ---- MODEL ----
 
 
+type alias ApiResponse =
+    { modelSrc : String, thumbSrc : String }
+
+
+type alias WithLoaded a =
+    { a | loaded : Bool }
+
+
 type alias ModelData =
-    { modelSrc : String, loaded : Bool }
+    WithLoaded ApiResponse
 
 
 type Model
@@ -41,9 +54,9 @@ getList =
         }
 
 
-listDecoder : Decoder (List String)
+listDecoder : Decoder (List ApiResponse)
 listDecoder =
-    field "printables" (list string)
+    field "printables" (list (map2 ApiResponse (field "modelSrc" string) (field "thumbSrc" string)))
 
 
 
@@ -51,8 +64,13 @@ listDecoder =
 
 
 type Msg
-    = GotList (Result Http.Error (List String))
+    = GotList (Result Http.Error (List ApiResponse))
     | Load String
+
+
+unloaded : ApiResponse -> ModelData
+unloaded { modelSrc, thumbSrc } =
+    { modelSrc = modelSrc, thumbSrc = thumbSrc, loaded = False }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -61,7 +79,7 @@ update msg model =
         GotList result ->
             case result of
                 Ok list ->
-                    ( Success { models = List.map (\s -> { modelSrc = s, loaded = False }) list }, Cmd.none )
+                    ( Success { models = List.map unloaded list }, Cmd.none )
 
                 Err why ->
                     ( Failure, Cmd.none )
@@ -74,7 +92,7 @@ update msg model =
                             List.map
                                 (\x ->
                                     if x.modelSrc == src then
-                                        { modelSrc = src, loaded = True }
+                                        { x | loaded = True }
 
                                     else
                                         x
@@ -113,18 +131,18 @@ viewList model =
 
 
 modelWithThumb : ModelData -> Html Msg
-modelWithThumb { modelSrc, loaded } =
-    viewModel modelSrc "https://marianatura.es/wp-content/uploads/2015/08/Chorizo-Barbacoa-Dulce.jpg" loaded
+modelWithThumb { modelSrc, thumbSrc, loaded } =
+    viewModel modelSrc thumbSrc loaded
 
 
 viewModel : String -> String -> Bool -> Html Msg
 viewModel modelSrc thumbnailSrc loaded =
     if loaded then
-        modelViewer (apiUrl ++ "static/" ++ modelSrc)
+        modelViewer (staticResource modelSrc)
 
     else
         button [ onClick (Load modelSrc) ]
-            [ img [ src thumbnailSrc ] []
+            [ img [ src (staticResource thumbnailSrc) ] []
             ]
 
 
