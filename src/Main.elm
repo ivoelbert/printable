@@ -1,12 +1,13 @@
 module Main exposing (..)
 
 import Browser
+import CustomElements exposing (..)
 import Header exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, src)
+import Html.Events exposing (onClick)
 import Http
 import Json.Decode exposing (Decoder, field, list, string)
-import ModelViewer exposing (..)
 
 
 apiUrl =
@@ -17,10 +18,14 @@ apiUrl =
 ---- MODEL ----
 
 
+type alias ModelData =
+    { modelSrc : String, loaded : Bool }
+
+
 type Model
     = Failure
     | Loading
-    | Success { models : List String, loaded : List String }
+    | Success { models : List ModelData }
 
 
 init : () -> ( Model, Cmd Msg )
@@ -47,6 +52,7 @@ listDecoder =
 
 type Msg
     = GotList (Result Http.Error (List String))
+    | Load String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -55,9 +61,29 @@ update msg model =
         GotList result ->
             case result of
                 Ok list ->
-                    ( Success { models = list, loaded = [] }, Cmd.none )
+                    ( Success { models = List.map (\s -> { modelSrc = s, loaded = False }) list }, Cmd.none )
 
                 Err why ->
+                    ( Failure, Cmd.none )
+
+        Load src ->
+            case model of
+                Success { models } ->
+                    let
+                        newModels =
+                            List.map
+                                (\x ->
+                                    if x.modelSrc == src then
+                                        { modelSrc = src, loaded = True }
+
+                                    else
+                                        x
+                                )
+                                models
+                    in
+                    ( Success { models = newModels }, Cmd.none )
+
+                _ ->
                     ( Failure, Cmd.none )
 
 
@@ -86,9 +112,20 @@ viewList model =
             div [] (List.map modelWithThumb models)
 
 
-modelWithThumb : String -> Html Msg
-modelWithThumb url =
-    viewModel (apiUrl ++ "static/" ++ url) "https://marianatura.es/wp-content/uploads/2015/08/Chorizo-Barbacoa-Dulce.jpg" False
+modelWithThumb : ModelData -> Html Msg
+modelWithThumb { modelSrc, loaded } =
+    viewModel modelSrc "https://marianatura.es/wp-content/uploads/2015/08/Chorizo-Barbacoa-Dulce.jpg" loaded
+
+
+viewModel : String -> String -> Bool -> Html Msg
+viewModel modelSrc thumbnailSrc loaded =
+    if loaded then
+        modelViewer (apiUrl ++ "static/" ++ modelSrc)
+
+    else
+        button [ onClick (Load modelSrc) ]
+            [ img [ src thumbnailSrc ] []
+            ]
 
 
 
