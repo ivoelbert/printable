@@ -8,6 +8,7 @@ import Html.Attributes exposing (attribute, src)
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode exposing (Decoder, field, list, map2, string)
+import Message exposing (..)
 import Model exposing (..)
 
 
@@ -48,11 +49,6 @@ listDecoder =
 
 
 -- UPDATE
-
-
-type Msg
-    = GotList (Result Http.Error (List ApiResponse))
-    | Load String
 
 
 unloaded : ApiResponse -> ModelData
