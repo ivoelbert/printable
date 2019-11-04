@@ -8,6 +8,11 @@ import Html.Attributes exposing (attribute, src)
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode exposing (Decoder, field, list, map2, string)
+import Model exposing (..)
+
+
+
+-- HELPERS
 
 
 apiUrl =
@@ -20,25 +25,7 @@ staticResource src =
 
 
 
----- MODEL ----
-
-
-type alias ApiResponse =
-    { modelSrc : String, thumbSrc : String }
-
-
-type alias WithLoaded a =
-    { a | loaded : Bool }
-
-
-type alias ModelData =
-    WithLoaded ApiResponse
-
-
-type Model
-    = Failure
-    | Loading
-    | Success { models : List ModelData }
+-- INIT
 
 
 init : () -> ( Model, Cmd Msg )
@@ -60,7 +47,7 @@ listDecoder =
 
 
 
----- UPDATE ----
+-- UPDATE
 
 
 type Msg
@@ -106,7 +93,7 @@ update msg model =
 
 
 
----- VIEW ----
+-- VIEW
 
 
 view : Model -> Html Msg
@@ -147,7 +134,7 @@ viewModel modelSrc thumbnailSrc loaded =
 
 
 
----- PROGRAM ----
+-- PROGRAM
 
 
 main : Program () Model Msg
