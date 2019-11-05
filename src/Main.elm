@@ -141,6 +141,9 @@ viewModel name loaded =
                     [ img [ class "model-thumbnail", src (getThumbSrc name) ] []
                     ]
                 ]
+        , div [ class "card-footer" ]
+        [ p [] [ text "download" ]
+        ]
         ]
 
 

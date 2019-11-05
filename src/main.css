@@ -19,22 +19,53 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
-h1 {
-    font-size: 30px;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    margin: 0;
+    color: #2b2b2b;
+}
+
+header {
+    background-color: #fafafa;
+    z-index: 10;
+    position: sticky;
+    box-shadow: 0 1px 2px #00000020;
+}
+
+header h1 {
+    font-size: 24px;
+    padding: 12px;
 }
 
 .models-container {
     display: flex;
     flex-direction: column;
     width: 100%;
-    padding: 0 12px;
+    padding: 0 16px;
     box-sizing: border-box;
+    background-color: #f4f4f4;
 }
 
 .model-card {
     width: 100%;
-    border: solid 1px #d4d4d4;
-    margin-bottom: 16px;
+    border: solid 1px #d0d0d0;
+    background-color: #fafafa;
+    border-radius: 5px;
+    margin-top: 16px;
+    overflow: hidden;
+    box-shadow: 0px 1px 2px #00000020;
+}
+
+.model-card h2 {
+    font-size: 18px;
+    font-weight: 100;
+    padding: 8px;
+    border-bottom: solid 1px #eaeaea;
 }
 
 .models-container .thumbnail-button-container,
@@ -57,6 +88,7 @@ model-viewer {
 
 .models-container .thumbnail-button img {
     height: 100%;
+    width: 100%;
     object-fit: cover;
     max-width: 100%;
 }
