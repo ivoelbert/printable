@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Browser
 import CustomElements exposing (..)
+import Download exposing (..)
 import Header exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -23,6 +24,16 @@ apiUrl =
 staticResource : String -> String
 staticResource src =
     apiUrl ++ "static/" ++ src
+
+
+getModelSrc : String -> String
+getModelSrc name =
+    staticResource <| name ++ "/" ++ name ++ ".gltf"
+
+
+getThumbSrc : String -> String
+getThumbSrc name =
+    staticResource <| name ++ "/" ++ name ++ ".jpg"
 
 
 
@@ -118,16 +129,6 @@ modelWithThumb { name, loaded } =
     viewModel name loaded
 
 
-getModelSrc : String -> String
-getModelSrc name =
-    staticResource <| name ++ "/" ++ name ++ ".gltf"
-
-
-getThumbSrc : String -> String
-getThumbSrc name =
-    staticResource <| name ++ "/" ++ name ++ ".jpg"
-
-
 viewModel : String -> Bool -> Html Msg
 viewModel name loaded =
     div [ class "model-card" ]
@@ -142,8 +143,8 @@ viewModel name loaded =
                     ]
                 ]
         , div [ class "card-footer" ]
-        [ p [] [ text "download" ]
-        ]
+            [ a [ class "download-button", href (getModelSrc name), download (name ++ ".gltf") ] [ downloadIcon False ]
+            ]
         ]
 
 
