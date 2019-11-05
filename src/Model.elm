@@ -4,7 +4,7 @@ module Model exposing (..)
 
 
 type alias ApiResponse =
-    { modelSrc : String, thumbSrc : String }
+    { name : String }
 
 
 type alias WithLoaded a =

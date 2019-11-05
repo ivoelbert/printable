@@ -4,7 +4,7 @@ import Browser
 import CustomElements exposing (..)
 import Header exposing (..)
 import Html exposing (..)
-import Html.Attributes exposing (attribute, src)
+import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode exposing (Decoder, field, list, map2, string)
@@ -42,18 +42,18 @@ getList =
         }
 
 
-listDecoder : Decoder (List ApiResponse)
+listDecoder : Decoder (List String)
 listDecoder =
-    field "printables" (list (map2 ApiResponse (field "modelSrc" string) (field "thumbSrc" string)))
+    field "printables" (Json.Decode.list (field "name" string))
 
 
 
 -- UPDATE
 
 
-unloaded : ApiResponse -> ModelData
-unloaded { modelSrc, thumbSrc } =
-    { modelSrc = modelSrc, thumbSrc = thumbSrc, loaded = False }
+unloaded : String -> ModelData
+unloaded name =
+    { name = name, loaded = False }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -67,14 +67,14 @@ update msg model =
                 Err why ->
                     ( Failure, Cmd.none )
 
-        Load src ->
+        Load name ->
             case model of
                 Success { models } ->
                     let
                         newModels =
                             List.map
                                 (\x ->
-                                    if x.modelSrc == src then
+                                    if x.name == name then
                                         { x | loaded = True }
 
                                     else
@@ -114,19 +114,32 @@ viewList model =
 
 
 modelWithThumb : ModelData -> Html Msg
-modelWithThumb { modelSrc, thumbSrc, loaded } =
-    viewModel modelSrc thumbSrc loaded
+modelWithThumb { name, loaded } =
+    viewModel name loaded
 
 
-viewModel : String -> String -> Bool -> Html Msg
-viewModel modelSrc thumbnailSrc loaded =
-    if loaded then
-        modelViewer (staticResource modelSrc)
+getModelSrc : String -> String
+getModelSrc name =
+    staticResource <| name ++ "/" ++ name ++ ".gltf"
 
-    else
-        button [ onClick (Load modelSrc) ]
-            [ img [ src (staticResource thumbnailSrc) ] []
-            ]
+
+getThumbSrc : String -> String
+getThumbSrc name =
+    staticResource <| name ++ "/" ++ name ++ ".jpg"
+
+
+viewModel : String -> Bool -> Html Msg
+viewModel name loaded =
+    div []
+        [ h2 [] [ text name ]
+        , if loaded then
+            modelViewer (getModelSrc name)
+
+          else
+            button [ onClick (Load name) ]
+                [ img [ class "model-thumbnail", src (getThumbSrc name) ] []
+                ]
+        ]
 
 
 

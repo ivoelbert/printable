@@ -9,5 +9,5 @@ import Model exposing (..)
 
 
 type Msg
-    = GotList (Result Http.Error (List ApiResponse))
+    = GotList (Result Http.Error (List String))
     | Load String
