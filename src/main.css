@@ -23,19 +23,40 @@ h1 {
     font-size: 30px;
 }
 
-img {
-    margin: 20px 0;
-    max-width: 200px;
+.models-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0 12px;
+    box-sizing: border-box;
 }
 
-button,
+.model-card {
+    width: 100%;
+    border: solid 1px #d4d4d4;
+    margin-bottom: 16px;
+}
+
+.models-container .thumbnail-button-container,
 model-viewer {
     width: 100%;
-    height: 400px;
+    height: 300px;
     outline: none;
+    background: none;
+    border: none;
+    padding: 0;
 }
 
-button img {
-    max-height: 100%;
+.models-container .thumbnail-button-container button {
+    outline: none;
+    background: none;
+    border: none;
+    padding: 0;
+    height: 100%;
+}
+
+.models-container .thumbnail-button img {
+    height: 100%;
+    object-fit: cover;
     max-width: 100%;
 }

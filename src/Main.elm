@@ -110,7 +110,7 @@ viewList model =
             p [] [ text "Loading list..." ]
 
         Success { models } ->
-            div [] (List.map modelWithThumb models)
+            div [ class "models-container" ] (List.map modelWithThumb models)
 
 
 modelWithThumb : ModelData -> Html Msg
@@ -130,14 +130,16 @@ getThumbSrc name =
 
 viewModel : String -> Bool -> Html Msg
 viewModel name loaded =
-    div []
+    div [ class "model-card" ]
         [ h2 [] [ text name ]
         , if loaded then
             modelViewer (getModelSrc name)
 
           else
-            button [ onClick (Load name) ]
-                [ img [ class "model-thumbnail", src (getThumbSrc name) ] []
+            div [ class "thumbnail-button-container" ]
+                [ button [ class "thumbnail-button", onClick (Load name) ]
+                    [ img [ class "model-thumbnail", src (getThumbSrc name) ] []
+                    ]
                 ]
         ]
 
