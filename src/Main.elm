@@ -62,9 +62,35 @@ listDecoder =
 -- UPDATE
 
 
-unloaded : String -> ModelData
-unloaded name =
-    { name = name, loaded = False }
+initialData : String -> ModelData
+initialData name =
+    { name = name, loaded = False, downloaded = False }
+
+
+updateLoaded : String -> List ModelData -> List ModelData
+updateLoaded name models =
+    List.map
+        (\x ->
+            if x.name == name then
+                { x | loaded = True }
+
+            else
+                x
+        )
+        models
+
+
+updateDownloaded : String -> List ModelData -> List ModelData
+updateDownloaded name models =
+    List.map
+        (\x ->
+            if x.name == name then
+                { x | downloaded = True }
+
+            else
+                x
+        )
+        models
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -73,7 +99,7 @@ update msg model =
         GotList result ->
             case result of
                 Ok list ->
-                    ( Success { models = List.map unloaded list }, Cmd.none )
+                    ( Success { models = List.map initialData list }, Cmd.none )
 
                 Err why ->
                     ( Failure, Cmd.none )
@@ -83,15 +109,19 @@ update msg model =
                 Success { models } ->
                     let
                         newModels =
-                            List.map
-                                (\x ->
-                                    if x.name == name then
-                                        { x | loaded = True }
+                            updateLoaded name models
+                    in
+                    ( Success { models = newModels }, Cmd.none )
 
-                                    else
-                                        x
-                                )
-                                models
+                _ ->
+                    ( Failure, Cmd.none )
+
+        Download name ->
+            case model of
+                Success { models } ->
+                    let
+                        newModels =
+                            updateDownloaded name models
                     in
                     ( Success { models = newModels }, Cmd.none )
 
@@ -125,12 +155,12 @@ viewList model =
 
 
 modelWithThumb : ModelData -> Html Msg
-modelWithThumb { name, loaded } =
-    viewModel name loaded
+modelWithThumb { name, loaded, downloaded } =
+    viewModel name loaded downloaded
 
 
-viewModel : String -> Bool -> Html Msg
-viewModel name loaded =
+viewModel : String -> Bool -> Bool -> Html Msg
+viewModel name loaded downloaded =
     div [ class "model-card" ]
         [ h2 [] [ text name ]
         , if loaded then
@@ -143,7 +173,7 @@ viewModel name loaded =
                     ]
                 ]
         , div [ class "card-footer" ]
-            [ a [ class "download-button", href (getModelSrc name), download (name ++ ".gltf") ] [ downloadIcon False ]
+            [ a [ onClick (Download name), class "download-button", href (getModelSrc name), download (name ++ ".gltf") ] [ downloadIcon downloaded ]
             ]
         ]
 

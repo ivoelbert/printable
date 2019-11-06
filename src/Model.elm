@@ -8,7 +8,7 @@ type alias ApiResponse =
 
 
 type alias WithLoaded a =
-    { a | loaded : Bool }
+    { a | loaded : Bool, downloaded : Bool }
 
 
 type alias ModelData =

@@ -11,3 +11,4 @@ import Model exposing (..)
 type Msg
     = GotList (Result Http.Error (List String))
     | Load String
+    | Download String
