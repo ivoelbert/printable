@@ -86,6 +86,11 @@ model-viewer {
     height: 100%;
 }
 
+.models-container .thumbnail-button-container button:focus,
+model-viewer:focus {
+    outline: solid 2px #2e8ad830;
+}
+
 .models-container .thumbnail-button img {
     height: 100%;
     width: 100%;
